@@ -4,31 +4,26 @@ pragma solidity 0.8.15;
 // import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "hardhat/console.sol";
+import {console} from "forge-std/console.sol";
 
-contract PuneetApplication is Ownable {
+contract PuneetKauraAppinfo is Ownable {
     mapping(string => bool) public unlockedDomain; // Check which domain has been unlocked
-    mapping(string => string) public applicationInfo; // Updated by owner only with resume and NOTIN
+    mapping(string => string) private applicationInfo; // Updated by owner only with resume and notion
     mapping(address => bool) public allowedAddress;
-    // mapping(string => bool) public allowedDomain;
     mapping(string => address) public unlocker;
-    mapping(address => bool) public dontLike;
+    // mapping(address => bool) public dontLike;
+    // mapping(string => bool) public allowedDomain;
 
     string[] private domainList;
 
-    constructor() {
-        // applicationInfo["resume"] = "https://resume.io/r/zBAefg";
-        // applicationInfo["notionTLDR"] = "https://resume.io/r/zBAefg";
-    }
+    constructor() {}
 
     function getApplicationInfo() public view returns (string[] memory) {
-        // How can this be calldata
         // Owner or AllowedAddress
         require(
             msg.sender == owner() || allowedAddress[msg.sender] == true,
             "Msg sender access is not Unlocked- Call Unlock first"
         );
-        // uint[] memory _applicationInfo = new uint[](3);
         string[] memory _applicationInfo = new string[](2);
         _applicationInfo[0] = applicationInfo["resume"];
         _applicationInfo[1] = applicationInfo["notionTLDR"];
@@ -40,19 +35,16 @@ contract PuneetApplication is Ownable {
     ) public view returns (string[] memory) {
         // How can this be calldata
         // Owner or AllowedAddress or Allowed domain as input
-        console.log("reaching here 1");
         if (
             msg.sender == owner() ||
             allowedAddress[msg.sender] == true ||
             unlockedDomain[_domain]
         ) {
-            console.log("reaching here 2");
             string[] memory _applicationInfo = new string[](2);
             _applicationInfo[0] = applicationInfo["resume"];
             _applicationInfo[1] = applicationInfo["notionTLDR"];
             return _applicationInfo;
         } else {
-            console.log("reaching here 3");
             revert("Msg sender access is not Unlocked- Call Unlock first");
         }
     }
@@ -72,7 +64,7 @@ contract PuneetApplication is Ownable {
             }
         }
         revert(
-            "Wrong domain - please enter the correct domain, domain is not in the allowed list"
+            "Domain Not allowed - please enter the correct domain, domain is not in the allowed list"
         );
     }
 
@@ -113,12 +105,10 @@ contract PuneetApplication is Ownable {
         return domainList;
     }
 
-    function DontLikeGameShowInfo() public returns (string[] memory) {
+    function DontLikeTheCTFShowInfo() public view returns (string[] memory) {
         string[] memory _applicationInfo = new string[](2);
         _applicationInfo[0] = applicationInfo["resume"];
         _applicationInfo[1] = applicationInfo["notionTLDR"];
-        dontLike[msg.sender] = true;
-        allowedAddress[msg.sender] = true;
         return _applicationInfo;
     }
 }
